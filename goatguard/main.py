@@ -1,4 +1,1 @@
-import test
-
-
-test.ingvar.cake()
+import safety
