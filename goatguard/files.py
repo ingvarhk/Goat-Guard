@@ -24,25 +24,33 @@ def getServicesFile():
     if os.path.isfile("passwords/services.json"):
         with open("passwords/services.json", "r") as f:
             content = f.read()
-            print("Reading file  data/services.json")
+            print("Reading file data/services.json")
             toReturn = json.loads(content)
 
             return toReturn
     else:
-        print("couldn't find setup.json")
+        print("couldn't find services.json")
         with open("passwords/services.json", "w") as f:
 
             toFille = {
+                "services": []
 
             }
+
             f.write(json.dumps(toFille))
             print("services.json created")
             return toFille
 
-def addToServicesFile():
-    with open(fname) as feedsjson:
-        feeds = json.load(feedsjson)
+def addToServicesFile(newService):
 
-    feeds.append(entry)
-    with open(fname, mode='w') as f:
-        f.write(json.dumps(feeds, indent=2))
+    with open("passwords/services.json", "r") as f:
+        services = json.loads(f.read())
+
+    services["services"].append(newService)
+
+    with open("passwords/services.json", "w") as f:
+        f.write(json.dumps(services))
+    if newService["type"] == "email":
+        print("New email added: ", newService["email"])
+    else:
+        print("New service added: ", newService["webaddress"])
