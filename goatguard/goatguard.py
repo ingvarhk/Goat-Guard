@@ -26,22 +26,27 @@ def clearScreen():
 def newToGoatGuard():
 
     passwordMatch = True
+    passwordToLong = False
 
     while True:
 
-        clearScreen()
-        print("------- NEW TO GOAT GUARD -------\n")
+        print("\n------- NEW TO GOAT GUARD -------\n")
         print("Before going bananas you will have to create a master password.\nThis will be hashed and used as a key for encrypting/decrypting passwords.\n")
 
         if not passwordMatch:
             print("WARNING: Passwords does not match. Try again.\n")
+        if passwordToLong:
+            print("WARNING: The password is to long. Try again.\n")
 
         passwordInput = getpass("Master password: ")
         passwordInputRepeat = getpass("Repeat: ")
 
         if passwordInput == passwordInputRepeat:
-            print("Succes! The passwords are matching.\n")
-            break
+            if len(passwordInput.encode()) > 32:
+                passwordToLong = True
+            else:
+                print("Succes! The passwords are matching.")
+                break
         else:
             passwordMatch = False
 
@@ -52,8 +57,6 @@ def setup():
 
     files.fileSetup()
     settings = files.getSettings()
-
-    clearScreen()
 
     if settings["newToGoatGuard"] == True:
         security.genSaltAndSave()
@@ -86,26 +89,27 @@ def main():
 
     setup()
 
+    print("\n------- GOAT GUARD -------\n")
 
-    print("------- GOAT GUARD -------\n")
-
-    masterpassword = getpass("Master password: ")
     print("Loading...")
-    key = security.generateKey(masterpassword)
+    key = security.generateKey(getpass("Master password: "))
 
     while True:
         userInput = input("## ")
 
         if userInput == "add":
+            print("Add")
+            password = security.encryptStuff(key, "1234")
 
-            files.Add.login("Exampel", True, "Shopping", "login.exampel.com", "testUsername", "1234")
+            files.Add.login("Exampel", True, "Shopping", "login.exampel.com", "testUsername", password)
             #files.Add.email("My email", False, "test@exampel.com", "qwerty", "gmail")
 
         elif userInput == "get":
-            print(getItem("secure/logins.json", "Exampel"))
+            print("Get")
+            #getItem("secure/logins.json", "Exampel")
 
         elif userInput == "remove":
-            pass
+            print("Remove")
 
         elif userInput == "help":
             print("""
@@ -122,10 +126,21 @@ INFO
             """)
 
         elif userInput == "clear":
-            if platform.system() == "Windows":
-                os.system('cls')
-            else:
-                os.system('clear')
+            clearScreen()
+
+        elif userInput == "test":
+            print("\nEncryption/decryption key: " + key.decode())
+            print("--------------------------")
+            #testInput = input("What do you want to encrypt? ")
+            #encrypted = security.encryptStuff(testInput, key)
+
+            #print("Encrypted: " + encrypted.decode())
+
+            testInput2 = input("What do you want to decrypt? ")
+
+            decrypted = security.decryptStuff(testInput2.encode(), key)
+            print("Decrypted: " + decrypted.decode())
+            print("--------------------------\n")
 
         elif userInput == "exit":
             print("Exiting..")

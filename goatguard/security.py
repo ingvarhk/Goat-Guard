@@ -1,5 +1,8 @@
 import bcrypt
+import hashlib
 from cryptography.fernet import Fernet
+import base64
+import os
 
 def genSaltAndSave():
     salt = bcrypt.gensalt()
@@ -9,14 +12,26 @@ def genSaltAndSave():
 
 def generateKey(masterPassword):
 
-    with open("data/ham/salt.txt", "rb") as f:
-        salt = f.read()
+    hashed = hashlib.sha256(masterPassword.encode()).digest()
+    #print("Hashed master password: " + str(hashed) + ". Length: " + str(len(hashed)))
 
-    key = bcrypt.hashpw(masterPassword.encode(), salt)
+    key = base64.urlsafe_b64encode(hashed)
+    #print("Encryption/decryption key: " + key.decode())
+
     return key
 
-def decrypt(key):
-    print("decrypting")
+def decryptStuff(toDecrypt, key):
+    print("INFO: Decrypting..")
 
-def encrypt(key):
-    print("encrypting")
+    f = Fernet(key)
+    decrypted = f.decrypt(toDecrypt)
+
+    return decrypted
+
+def encryptStuff(toEncrypt, key):
+    print("INFO: Encrypting..")
+
+    f = Fernet(key)
+    encrypted = f.encrypt(toEncrypt.encode())
+
+    return encrypted
