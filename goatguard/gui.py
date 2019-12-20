@@ -12,7 +12,7 @@ def window():
 
     root.mainloop()
 
-def addLoginGui():
+def test():
     window = Tk()
     window.title("Goat Guard - Add login")
     window.geometry("250x300")

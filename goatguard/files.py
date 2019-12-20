@@ -59,12 +59,6 @@ def fileSetup():
     if not os.path.isdir("data"):
         os.mkdir("data")
         print("INFO: Folder 'data' created")
-    if not os.path.isdir("data/ham"):
-        os.mkdir("data/ham")
-        print("INFO: Folder 'data/ham' created")
-
-    with open("data/ham/pepper.txt", "w+") as f:
-        f.write("Why do sharks swim in salt water?\nCause pepper water makes them sneeze!")
 
 
     files = []

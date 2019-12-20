@@ -1,14 +1,9 @@
 import bcrypt
 import hashlib
 from cryptography.fernet import Fernet
+from cryptography.fernet import InvalidToken
 import base64
 import os
-
-def genSaltAndSave():
-    salt = bcrypt.gensalt()
-
-    with open("data/ham/salt.txt", "wb+") as f:
-        f.write(salt)
 
 def generateKey(masterPassword):
 
@@ -24,7 +19,11 @@ def decryptStuff(toDecrypt, key):
     print("INFO: Decrypting..")
 
     f = Fernet(key)
-    decrypted = f.decrypt(toDecrypt)
+    try:
+        decrypted = f.decrypt(toDecrypt)
+    except InvalidToken:
+        print("WARNING: Could not decrypt. Wrong key.")
+        decrypted = b"Wrong key."
 
     return decrypted
 

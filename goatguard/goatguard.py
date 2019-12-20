@@ -1,6 +1,7 @@
 import security
 import files
 import gui
+import console
 
 from getpass import getpass
 import os, sys, platform
@@ -14,7 +15,6 @@ import os, sys, platform
 # Computer: Name, Favorite, Username, Password
 # Note: Name, Favorite, Favorite, Content
 # File: Name, Favorite, Size, Preview, Date, Content
-
 def clearScreen():
     global operatingSystem
 
@@ -26,27 +26,21 @@ def clearScreen():
 def newToGoatGuard():
 
     passwordMatch = True
-    passwordToLong = False
 
     while True:
 
-        print("\n------- NEW TO GOAT GUARD -------\n")
+        print(console.cyan + "\n------- NEW TO GOAT GUARD -------\n" + console.reset)
         print("Before going bananas you will have to create a master password.\nThis will be hashed and used as a key for encrypting/decrypting passwords.\n")
 
         if not passwordMatch:
-            print("WARNING: Passwords does not match. Try again.\n")
-        if passwordToLong:
-            print("WARNING: The password is to long. Try again.\n")
+            console.warning("Passwords does not match. Try again.\n")
 
         passwordInput = getpass("Master password: ")
         passwordInputRepeat = getpass("Repeat: ")
 
         if passwordInput == passwordInputRepeat:
-            if len(passwordInput.encode()) > 32:
-                passwordToLong = True
-            else:
-                print("Succes! The passwords are matching.")
-                break
+            console.info("Succes! The passwords are matching.")
+            break
         else:
             passwordMatch = False
 
@@ -59,9 +53,6 @@ def setup():
     settings = files.getSettings()
 
     if settings["newToGoatGuard"] == True:
-        security.genSaltAndSave()
-        print("INFO: Salt genrated.")
-
         newToGoatGuard()
 
 def getItem(path, name):
@@ -74,13 +65,13 @@ def getItem(path, name):
         for item in content[category]:
             if item["name"] == name:
                     return item
-        print("WARNING: Could not find " + name)
+        console.warning("Could not find " + name)
     except:
         pass
 
 def main():
     global operatingSystem
-    print("\n------- LOADING FILES AND SETTING UP -------\n")
+    print(console.cyan + "\n------- LOADING FILES AND SETTING UP -------\n" + console.reset)
 
     if platform.system() == "Windows":
         operatingSystem = "Windows"
@@ -89,17 +80,20 @@ def main():
 
     setup()
 
-    print("\n------- GOAT GUARD -------\n")
+    print(console.cyan + "\n------- GOAT GUARD -------\n" + console.reset)
 
-    print("Loading...")
+    #gui.test()
+
     key = security.generateKey(getpass("Master password: "))
 
     while True:
         userInput = input("## ")
 
         if userInput == "add":
-            print("Add")
-            password = security.encryptStuff(key, "1234")
+            print(console.pink + "[1]" + console.reset + " - Login\n" + console.pink + "[2]" + console.reset + " - Email\n" + console.pink + "[3]" + console.reset + " - Credit Card\n" + console.pink + "[4]" + console.reset + " - Computer\n" + console.pink + "[5]" + console.reset + " - Note")
+            addType = input("What do you choose: ")
+
+            password = security.encryptStuff("hej", key)
 
             files.Add.login("Exampel", True, "Shopping", "login.exampel.com", "testUsername", password)
             #files.Add.email("My email", False, "test@exampel.com", "qwerty", "gmail")
@@ -129,12 +123,12 @@ INFO
             clearScreen()
 
         elif userInput == "test":
-            print("\nEncryption/decryption key: " + key.decode())
+            #print("\nEncryption/decryption key: " + key.decode())
             print("--------------------------")
-            #testInput = input("What do you want to encrypt? ")
-            #encrypted = security.encryptStuff(testInput, key)
+            testInput = input("What do you want to encrypt? ")
+            encrypted = security.encryptStuff(testInput, key)
 
-            #print("Encrypted: " + encrypted.decode())
+            print("Encrypted: " + encrypted.decode())
 
             testInput2 = input("What do you want to decrypt? ")
 
@@ -149,7 +143,7 @@ INFO
         elif userInput == "" or userInput.isspace():
             pass
         else:
-            print("WARNING: Unvalid command. Try 'help'")
+            console.warning("Unvalid command. Try 'help'")
 
     #decryptPassword()
     #encryptPassword()
