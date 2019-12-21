@@ -1,34 +1,42 @@
-import bcrypt
 import hashlib
+import base64
 from cryptography.fernet import Fernet
 from cryptography.fernet import InvalidToken
-import base64
-import os
+
+import random
+
+import console
+
+def generatePassword(lenght):
+    chooseFrom = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+    password = ""
+
+    for i in range(0, lenght):
+        password += random.choice(chooseFrom)
+
+    return password
 
 def generateKey(masterPassword):
 
-    hashed = hashlib.sha256(masterPassword.encode()).digest()
+    hashed = hashlib.sha3_256(masterPassword.encode()).digest()
     #print("Hashed master password: " + str(hashed) + ". Length: " + str(len(hashed)))
-
     key = base64.urlsafe_b64encode(hashed)
     #print("Encryption/decryption key: " + key.decode())
 
     return key
 
 def decryptStuff(toDecrypt, key):
-    print("INFO: Decrypting..")
 
     f = Fernet(key)
     try:
         decrypted = f.decrypt(toDecrypt)
     except InvalidToken:
-        print("WARNING: Could not decrypt. Wrong key.")
+        console.warning("WARNING: Could not decrypt. Wrong key.")
         decrypted = b"Wrong key."
 
     return decrypted
 
 def encryptStuff(toEncrypt, key):
-    print("INFO: Encrypting..")
 
     f = Fernet(key)
     encrypted = f.encrypt(toEncrypt.encode())

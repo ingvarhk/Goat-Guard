@@ -1,21 +1,22 @@
 import json
 import os
+import console
 
 def getJsonFile(path, category):
     if os.path.isfile(path):
         with open(path, "r") as f:
             content = f.read()
-            print("INFO: Reading file " + path)
+            console.info("Reading file " + path)
 
             try:
                 jsonStuff = json.loads(content)
             except Exception as e:
-                print("ERROR: No " + category + " avaiable. ")
+                console.error("No " + category + " avaiable. ")
                 jsonStuff = "ERROR: No " + category + " avaiable"
 
             return jsonStuff
     else:
-        print("WARNING: Couldn't find ", path)
+        console.warning("Couldn't find " + str(path))
         with open(path, "w") as f:
 
             toFille = {
@@ -24,7 +25,7 @@ def getJsonFile(path, category):
             }
 
             f.write(json.dumps(toFille))
-            print("INFO: File " + path + " created")
+            console.info("File " + path + " created")
             return toFille
 
 def appendToJsonFile(path, category, new):
@@ -35,34 +36,34 @@ def appendToJsonFile(path, category, new):
             try:
                 content[category].append(new)
             except Exception as e:
-                print("ERROR: Could not append new " + category.replace("s", ""))
+                console.error("Could not append new " + category.replace("s", ""))
 
         except Exception as e:
-            print("ERROR: Could not load " + category)
+            console.error("Could not load " + category)
 
 
     with open(path, "w") as f:
         try:
             f.write(json.dumps(content))
-            print("INFO: New " + category.replace("s", "") + " added")
+            console.info("New " + category.replace("s", "") + " added")
 
         except Exception as e:
-            print("ERROR: Could not save to " + path)
+            console.error("Could not save to " + path)
 
 def fileSetup():
     if not os.path.isdir("secure"):
         os.mkdir("secure")
-        print("INFO: Folder 'secure' created")
+        console.info("Folder 'secure' created")
     if not os.path.isdir("secure/files"):
         os.mkdir("secure/files")
-        print("INFO: Folder 'secure/files' created")
+        console.info("Folder 'secure/files' created")
     if not os.path.isdir("data"):
         os.mkdir("data")
-        print("INFO: Folder 'data' created")
+        console.info("Folder 'data' created")
 
 
     files = []
-    allFiles = ["secure/logins.json", "secure/emails.json", "secure/creditcards.json", "secure/notes.json"]
+    allFiles = ["secure/logins.json", "secure/computers.json", "secure/emails.json", "secure/creditcards.json", "secure/notes.json"]
 
     for file in os.listdir('secure'):
         path = "secure/" + file
@@ -72,23 +73,22 @@ def fileSetup():
 
             with open(path, "r") as f:
                 content = f.read()
-                print("INFO: Checking file " + path)
+                console.info("Checking file " + path)
 
                 try:
                     jsonStuff = json.loads(content)
 
                 except Exception as e:
-                    print("WARNING: Could not load file " + path)
+                    console.warning("Could not load file " + path)
 
                     with open(path, "w") as f:
-
                         toFile = {
                             file.replace('.json',''): []
 
                         }
 
                         f.write(json.dumps(toFile))
-                        print("INFO: File " + path + " created")
+                        console.info("File " + path + " created")
 
     for file in files:
         for otherFile in allFiles:
@@ -96,7 +96,7 @@ def fileSetup():
                 allFiles.remove(otherFile)
 
     for missingFile in allFiles:
-        print("WARNING: Could not find file " + missingFile)
+        console.warning("Could not find file " + missingFile)
 
         with open(missingFile, "w") as f:
 
@@ -106,7 +106,7 @@ def fileSetup():
             }
 
             f.write(json.dumps(toFile))
-            print("INFO: " + missingFile + " created")
+            console.info("File " + missingFile + " created")
 
 
 
@@ -114,19 +114,18 @@ def getSettings():
     if os.path.isfile("data/settings.json"):
         with open("data/settings.json", "r") as f:
             content = f.read()
-            print("INFO: Reading file data/settings.json")
+            console.info("Reading file data/settings.json")
 
             return json.loads(content)
     else:
-        print("WARNING: Could not find settings.json")
+        console.warning("Could not find settings.json")
         with open("data/settings.json", "w") as f:
 
             toFile = {
-              "newToGoatGuard": True,
               "developer": False
             }
             f.write(json.dumps(toFile))
-            print("INFO: File data/settings.json created")
+            console.info("File data/settings.json created")
             return toFile
 
 def setNewToFalseSettings():
@@ -139,11 +138,10 @@ def setNewToFalseSettings():
         json.dump(data, jsonFile)
 
 class Add:
-    def login(name, favorite, tag, url, username, password):
+    def login(name, tag, url, username, password):
 
         newLogin =  {
             "name": name,
-            "favorite": favorite,
             "tag": tag,
             "url": url,
             "username": username,
@@ -152,11 +150,11 @@ class Add:
 
         appendToJsonFile("secure/logins.json", "logins", newLogin)
 
-    def email(name, favorite, emailaddress, password, provider):
+    def email(name, tag, emailaddress, password, provider):
 
         newEmail =  {
             "name": name,
-            "favorite": favorite,
+            "tag": tag,
             "emailaddress": emailaddress,
             "password": password,
             "provider": provider
@@ -164,40 +162,40 @@ class Add:
 
         appendToJsonFile("secure/emails.json", "emails", newEmail)
 
-    def creditcard(name, favorite, owner, type, number, cvc, expire):
+    def creditcard(name, tag, owner, type, number, cvcOrCvv, expiry):
 
         newCreditcard =  {
             "name": name,
-            "favorite": favorite,
+            "tag": tag,
             "owner": owner,
             "type": type,
             "number": number,
-            "cvc": cvc,
-            "expire": expire
+            "cvc/cvv": cvcOrCvv,
+            "expiry": expiry
         }
 
         appendToJsonFile("secure/creditcards.json", "creditcards", newCreditcard)
 
-    def computer(name, favorite, username, password):
+    def computer(name, tag, username, password):
 
         newComputer =  {
             "name": name,
-            "favorite": favorite,
+            "tag": tag,
             "username": username,
             "password": password
         }
 
         appendToJsonFile("secure/computers.json", "computers", newComputer)
 
-    def note(name, favorite, content):
+    def note(name, tag, content):
 
         newNote =  {
             "name": name,
-            "favorite": favorite,
+            "tag": tag,
             "content": content
         }
 
-        appendToJsonFile("secure/newNote.json", "notes", newNote)
+        appendToJsonFile("secure/notes.json", "notes", newNote)
 
     def file():
-        print("Not working yet :(")
+        console.warning("Not working yet :(")
