@@ -29,10 +29,9 @@ def decryptStuff(toDecrypt, key):
 
     f = Fernet(key)
     try:
-        decrypted = f.decrypt(toDecrypt)
+        decrypted = f.decrypt(toDecrypt.encode())
     except InvalidToken:
-        console.warning("WARNING: Could not decrypt. Wrong key.")
-        decrypted = b"Wrong key."
+        decrypted = b"Access denied."
 
     return decrypted
 

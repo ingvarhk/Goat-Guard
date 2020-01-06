@@ -6,13 +6,13 @@ def getJsonFile(path, category):
     if os.path.isfile(path):
         with open(path, "r") as f:
             content = f.read()
-            console.info("Reading file " + path)
+            #console.info("Reading file " + path)
 
             try:
                 jsonStuff = json.loads(content)
             except Exception as e:
                 console.error("No " + category + " avaiable. ")
-                jsonStuff = "ERROR: No " + category + " avaiable"
+                jsonStuff = None
 
             return jsonStuff
     else:

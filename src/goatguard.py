@@ -25,28 +25,9 @@ def clearScreen():
     else:
         os.system('clear')
 
-def setup():
-    global settings
-
-    files.fileSetup()
-    settings = files.getSettings()
-
-def getItem(path, name):
-
-    category = os.path.basename(path).replace(".json", "")
-
-    try:
-        content = files.getJsonFile(path, category)
-
-        for item in content[category]:
-            if item["name"] == name:
-                    return item
-        console.warning("Could not find " + name)
-    except:
-        pass
-
 def main():
     global operatingSystem
+
     print(console.cyan + "\n------- LOADING FILES AND SETTING UP -------\n" + console.reset)
 
 #   Get OS
@@ -55,7 +36,8 @@ def main():
     else:
         operatingSystem = "Other"
 
-    setup()
+    files.fileSetup()
+    settings = files.getSettings()
 
 #   Get Master password
     print(console.cyan + "\n------- MASTER PASSWORD -------\n" + console.reset)
@@ -76,6 +58,7 @@ def main():
 
             if choice == "" or choice.isspace():
                 console.warning("Missing argument. Try 'add help'")
+
 
             elif choice.startswith("l"):
                 print(console.cyan + "\nAdd login" + console.reset)
@@ -154,11 +137,11 @@ def main():
                         console.warning("You must enter a number.")
                     else:
                         if rawNumber.isdigit():
-                            if len(rawNumber) == 16:
+                            if len(rawNumber) <= 16:
                                 number = security.encryptStuff(rawNumber, key)
                                 break
                             else:
-                                console.warning("The number is not 16 digits long.")
+                                console.warning("The number is over 16 digits long.")
 
                         else:
                             console.warning("No letters. Only digits.")
@@ -244,7 +227,7 @@ def main():
                 files.Add.note(name, tag, content.decode())
 
             elif choice.startswith("h"):
-                print("- l, login\n- e, email\n- c, credit card\n- p, pc\n- n, note")
+                print("ADD - HELP:\n - l [login]\n - e [email]\n - c [credit card]\n - p [pc]\n - n [note]\n\nEXAMPEL:\n - add l\n - add p")
 
             else:
                 console.warning("Unknown argument. Try 'add h' for help.")
@@ -254,6 +237,7 @@ def main():
 
         elif userInput.startswith("gen"):
             lenght = userInput.replace("gen ", "").replace("gen", "")
+
             if not lenght == "" and not lenght.isspace():
                 if lenght.isdigit():
                     print(security.generatePassword(int(lenght)))
@@ -262,9 +246,164 @@ def main():
             else:
                 console.warning("Missing argument. This requires a number as argument.")
 
-        elif userInput == "get":
-            #path input()
-            pass
+        elif userInput.startswith("get"):
+
+            choice = userInput.replace("get ", "").replace("get", "")
+
+            if choice == "" or choice.isspace():
+                console.warning("Missing argument. Try 'get h' for help.")
+
+
+            elif choice.startswith("l"):
+                print(console.cyan + "\nGet login" + console.reset)
+                items = files.getJsonFile("secure/logins.json", "logins")
+
+                if not items == None:
+                    number = 1
+
+                    for login in items["logins"]:
+                        print(console.pink + "[" + str(number) + "] " + console.reset + login["name"])
+                        number += 1
+
+                    if number != 1:
+                        loginNumberInput = input("\nLogin number: ")
+
+                        if loginNumberInput.isdigit() and loginNumberInput != "":
+                            newNumber = 1
+                            for login in items["logins"]:
+                                if newNumber == int(loginNumberInput):
+                                    print("")
+                                    print("Web address: " + login["url"])
+                                    if login["tag"] != "":
+                                        print("Tag: " + login["tag"])
+                                    print("Username: " + login["username"])
+                                    print("Password: " + security.decryptStuff(login["password"], key).decode())
+                                    print("")
+                                newNumber += 1
+                    else:
+                        console.warning("No logins avaiable.\n")
+
+            elif choice.startswith("e"):
+                print(console.cyan + "\nGet email" + console.reset)
+
+                items = files.getJsonFile("secure/emails.json", "emails")
+
+                if not items == None:
+                    number = 1
+                    for email in items["emails"]:
+                        print(console.pink + "[" + str(number) + "] " + console.reset + email["name"])
+                        number += 1
+
+                    if number != 1:
+                        emailNumberInput = input("\nEmail number: ")
+                        if emailNumberInput.isdigit() and emailNumberInput != "":
+                            newNumber = 1
+
+                            for email in items["emails"]:
+                                if newNumber == int(emailNumberInput):
+                                    print("")
+                                    print("Email address: " + email["emailaddress"])
+                                    if email["tag"] != "":
+                                        print("Tag: " + email["tag"])
+                                    print("Password: " + security.decryptStuff(email["password"], key).decode())
+                                    print("")
+
+                                newNumber += 1
+                    else:
+                        console.warning("No emails avaiable.\n")
+
+            elif choice.startswith("c"):
+                print(console.cyan + "\nGet credit card" + console.reset)
+
+                items = files.getJsonFile("secure/creditcards.json", "creditcards")
+
+                if not items == None:
+                    number = 1
+                    for card in items["creditcards"]:
+                        print(console.pink + "[" + str(number) + "] " + console.reset + card["name"])
+                        number += 1
+
+                    if number != 1:
+                        cardNumberInput = input("\nCard number: ")
+                        if cardNumberInput.isdigit() and cardNumberInput != "":
+                            newNumber = 1
+
+                            for card in items["creditcards"]:
+                                if newNumber == int(cardNumberInput):
+                                    print("")
+                                    print("Owner: " + card["owner"])
+                                    print("Type: " + card["type"])
+                                    print("Number: " + security.decryptStuff(card["number"], key).decode())
+                                    print("CVC/CVV: " + security.decryptStuff(card["cvc/cvv"], key).decode())
+                                    print("Expiry date: " + security.decryptStuff(card["expiry"], key).decode())
+                                    print("")
+
+                                newNumber += 1
+                    else:
+                        console.warning("No credit cards avaiable.\n")
+
+            elif choice.startswith("p"):
+                print(console.cyan + "\nGet computer" + console.reset)
+                items = files.getJsonFile("secure/computers.json", "computers")
+
+                if not items == None:
+                    number = 1
+
+                    for computer in items["computers"]:
+                        print(console.pink + "[" + str(number) + "] " + console.reset + computer["name"])
+                        number += 1
+
+                    if number != 1:
+                        pcNumberInput = input("\nComputer number: ")
+
+                        if pcNumberInput.isdigit() and pcNumberInput != "":
+                            newNumber = 1
+                            for computer in items["computers"]:
+                                if newNumber == int(pcNumberInput):
+                                    print("")
+                                    print("Computer name: " + computer["name"])
+                                    if computer["tag"] != "":
+                                        print("Tag: " + computer["tag"])
+                                    print("Username: " + computer["username"])
+                                    print("Password: " + security.decryptStuff(computer["password"], key).decode())
+                                    print("")
+                                newNumber += 1
+                    else:
+                        console.warning("No computers avaiable.\n")
+
+            elif choice.startswith("n"):
+                print(console.cyan + "\nGet note" + console.reset)
+                items = files.getJsonFile("secure/notes.json", "notes")
+
+                if not items == None:
+                    number = 1
+
+                    for note in items["notes"]:
+                        print(console.pink + "[" + str(number) + "] " + console.reset + note["name"])
+                        number += 1
+
+                    if number != 1:
+                        noteNumberInput = input("\nNote number: ")
+
+                        if noteNumberInput.isdigit() and noteNumberInput != "":
+                            newNumber = 1
+                            for note in items["notes"]:
+                                if newNumber == int(noteNumberInput):
+                                    print("")
+                                    print("Note name: " + note["name"])
+                                    if note["tag"] != "":
+                                        print("Tag: " + note["tag"])
+                                    print("Content: " + security.decryptStuff(note["content"], key).decode())
+                                    print("")
+                                newNumber += 1
+                    else:
+                        console.warning("No notes avaiable.\n")
+
+            elif choice.startswith("h"):
+                print("GET - HELP:\n - l [login]\n - e [email]\n - c [credit card]\n - p [pc]\n - n [note]\n\nEXAMPEL:\n - get l\n - get p")
+
+            else:
+                console.warning("Unknown argument. Try 'get h' for help.")
 
         elif userInput == "remove":
             print("Remove")
@@ -272,13 +411,14 @@ def main():
         elif userInput == "help":
             print("""
 COMMANDS
-    add - login, email, credit card, note or file
-    remove - delete login, email, creditcard, note or file
-    get - get login, email, creditcard, note or file
+    add  - Options: l [login], e [email], c [credit card], p [computer], n [note]
+    remove - Options: l [login], e [email], c [credit card], p [computer], n [note]
+    get - Options: l [login], e [email], c [credit card], p [computer], n [note]
 
-    gen - genrate password
+    gen - generate password - Arguments: <lenght>
 
     clear - clear screen
+    info - info about Goat Guard
     exit - exit goat guard
 """)
 
@@ -291,20 +431,6 @@ INFO
 
         elif userInput == "clear":
             clearScreen()
-
-        elif userInput == "test":
-            #print("\nEncryption/decryption key: " + key.decode())
-            print("--------------------------")
-            testInput = input("What do you want to encrypt? ")
-            encrypted = security.encryptStuff(testInput, key)
-
-            print("Encrypted: " + encrypted.decode())
-
-            testInput2 = input("What do you want to decrypt? ")
-
-            decrypted = security.decryptStuff(testInput2.encode(), key)
-            print("Decrypted: " + decrypted.decode())
-            print("--------------------------\n")
 
         elif userInput == "exit":
             console.warning("Exiting..")
