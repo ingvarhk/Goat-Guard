@@ -1,3 +1,4 @@
+import pyperclip
 import security
 import files
 import gui
@@ -240,9 +241,16 @@ def main():
 
             if not lenght == "" and not lenght.isspace():
                 if lenght.isdigit():
-                    print(security.generatePassword(int(lenght)))
+                    generated = security.generatePassword(int(lenght))
+                    print(generated)
+
+                    pyperclip.copy(generated)
+                    pyperclip.paste()
+
+                    console.info("Password generated. Added to clipholder.")
                 else:
                     console.warning("Argument is not integer.")
+                    
             else:
                 console.warning("Missing argument. This requires a number as argument.")
 
