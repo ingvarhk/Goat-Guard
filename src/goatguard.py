@@ -87,7 +87,7 @@ def main():
                             url = "http://" + url
 
                         if not validators.url(url):
-                            console.warning("Not a valid web address.")
+                            console.error("Not a valid web address.")
                         else:
                             break
 
@@ -433,8 +433,9 @@ COMMANDS
         elif userInput == "info":
             print("""
 INFO
-    Made by Ingvar Hahn Kristensen 2019
+    Made by Ingvar Hahn Kristensen 2024
     Website: \033[4mhttp://ingvar.xyz\u001b[0m
+    Contributors: Ingvar Hahn Kristensen, Ha1fdan
 """)
 
         elif userInput == "clear":

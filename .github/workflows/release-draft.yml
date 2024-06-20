@@ -1,0 +1,26 @@
+# .github/workflows/release-draft.yml
+
+name: Release Draft
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  release:
+      types: [published]
+
+permissions:
+  actions: read
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  release_draft:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Release Draft
+      uses: crs-k/release-draft@v0.6.1
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
