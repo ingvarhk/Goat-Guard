@@ -4,17 +4,13 @@ from cryptography.fernet import Fernet
 from cryptography.fernet import InvalidToken
 
 import random
+import string
 
 import console
 
 def generatePassword(lenght):
-    chooseFrom = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
-    password = ""
-
-    for i in range(0, lenght):
-        password += random.choice(chooseFrom)
-
-    return password
+    choose_from = string.ascii_letters + string.digits + string.punctuation
+    return ''.join(random.choices(choose_from, k=lenght))
 
 def generateKey(masterPassword):
 
