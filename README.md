@@ -38,5 +38,5 @@ COMMANDS
     exit - exit goat guard
 ```
 
-### Warning
+### Warning - WIP
 This project is still in development, please use at your own risk.
